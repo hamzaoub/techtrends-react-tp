@@ -5,6 +5,12 @@ services:
       dockerfile: Dockerfile
     environment:
       SERVICE_FQDN_FRONTEND_8080: /
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.techtrends-tp3-tyspnf.rule=Host(`tp3-tyspnfjkpyoanadkb6x1e5ds.179.236.233.106.sslip.io`)'
+      - 'traefik.http.routers.techtrends-tp3-tyspnf.entrypoints=http'
+      - 'traefik.http.routers.techtrends-tp3-tyspnf.service=techtrends-tp3-tyspnf'
+      - 'traefik.http.services.techtrends-tp3-tyspnf.loadbalancer.server.port=8080'
     depends_on:
       - api
 
