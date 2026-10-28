@@ -10,8 +10,8 @@ import AjouterTechnologie from './components/AjouterTechnologie';
 import type { Technologie } from './components/CarteTechnologie';
 
 interface Paquet {
-  collected: { metadata: { name: string } };
-  score: { detail: { popularity: number } };
+  package: string;
+  downloads: number;
 }
 
 function App() {
@@ -26,20 +26,19 @@ function App() {
 
     async function charger() {
       try {
-        const reponse = await fetch('https://api.npms.io/v2/package/mget', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(['react', 'typescript', 'dockerode', 'redis', 'pg', 'openai']),
-        });
+        const reponse = await fetch('https://api.npmjs.org/downloads/point/last-week/react,typescript,dockerode,redis,pg,openai');
         if (!reponse.ok) {
           throw new Error('Réponse du serveur incorrecte : ' + reponse.status);
         }
         const donnees: Record<string, Paquet> = await reponse.json();
-        const liste = Object.values(donnees).map((paquet) => ({
-          id: paquet.collected.metadata.name,
-          nom: paquet.collected.metadata.name,
+        const paquets = Object.values(donnees);
+        const maximum = Math.max(...paquets.map((paquet) => paquet.downloads), 1);
+        const liste = paquets.map((paquet) => ({
+          id: paquet.package,
+          nom: paquet.package,
           categorie: 'Paquet npm',
-          niveauPopularite: Math.round(paquet.score.detail.popularity * 5),
+          niveauPopularite: Math.max(1, Math.ceil(paquet.downloads / maximum * 5)),
+          telechargements: paquet.downloads,
           couleur: '#3178c6',
         }));
         if (!annule) {
@@ -69,7 +68,7 @@ function App() {
   const nbCartes = technologiesTriees.length;
   return (
     <main>
-      <Header titre="TechTrends — Galerie des tendances" phrase="Recherchez un paquet npm (données npms.io)" />
+      <Header titre="TechTrends — Galerie des tendances" phrase="Recherchez un paquet npm" />
       <Recherche valeur={recherche} onChange={setRecherche} />
       <button onClick={() => setTriCroissant(!triCroissant)}>
         Trier ({triCroissant ? 'A → Z' : 'Z → A'})

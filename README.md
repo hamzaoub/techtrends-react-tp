@@ -2,8 +2,8 @@
 
 Projet React et TypeScript réalisé avec Vite pour le TP « React, premier contact ».
 
-La galerie charge des paquets npm depuis l'API npms.io. La popularité affichée
-sur 5 est calculée à partir du score de popularité retourné par cette API.
+La galerie charge les téléchargements de paquets depuis l'API npm. La popularité
+sur 5 compare chaque paquet au plus téléchargé de la liste sur les 7 jours disponibles.
 Les tâches et les articles viennent de JSONPlaceholder. La liste des produits
 utilise l'API du TP3 sur `http://localhost:3000/api/produits` si elle est lancée.
 
