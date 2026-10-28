@@ -1,0 +1,5 @@
+.git
+node_modules
+dist
+tp3-api
+.env

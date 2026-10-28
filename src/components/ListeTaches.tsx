@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import type { Todo } from '../types';
 
+interface Issue {
+  id: number;
+  title: string;
+  state: 'open' | 'closed';
+  html_url: string;
+  pull_request?: unknown;
+}
+
 function ListeTaches() {
   const [taches, setTaches] = useState<Todo[]>([]);
   const [chargement, setChargement] = useState(true);
@@ -11,18 +19,26 @@ function ListeTaches() {
 
     async function charger() {
       try {
-        const reponse = await fetch('https://jsonplaceholder.typicode.com/users/1/todos');
+        const reponse = await fetch('https://api.github.com/repos/facebook/react/issues?state=all&per_page=30');
         if (!reponse.ok) {
-          throw new Error('Réponse du serveur incorrecte : ' + reponse.status);
+          throw new Error('Réponse de GitHub incorrecte : ' + reponse.status);
         }
-        const donnees: Todo[] = await reponse.json();
+        const donnees: Issue[] = await reponse.json();
+        const issues = donnees.filter((issue) => !issue.pull_request).map((issue) => ({
+          id: issue.id,
+          title: issue.title,
+          completed: issue.state === 'closed',
+          url: issue.html_url,
+        }));
         if (!annule) {
-          setTaches(donnees);
+          setTaches(issues);
           setChargement(false);
         }
       } catch (e) {
         if (!annule) {
-          setErreur(e instanceof Error ? e.message : 'Erreur inconnue');
+          setErreur(e instanceof TypeError
+            ? 'Impossible de joindre GitHub.'
+            : e instanceof Error ? e.message : 'Erreur inconnue');
           setChargement(false);
         }
       }
@@ -34,16 +50,23 @@ function ListeTaches() {
     };
   }, []);
 
-  if (chargement) return <p>Chargement des données…</p>;
+  if (chargement) return <p>Chargement des tâches…</p>;
   if (erreur) return <p role="alert" style={{ color: '#c62828' }}>Erreur : {erreur}</p>;
-  if (taches.length === 0) return <p>Aucune tâche.</p>;
+  if (taches.length === 0) return <p>Aucune tâche trouvée.</p>;
 
   return (
-    <ul>
-      {taches.map((tache) => (
-        <li key={tache.id}>{tache.completed ? '☑' : '☐'} {tache.title}</li>
-      ))}
-    </ul>
+    <>
+      <p>Issues publiques du projet React sur GitHub :</p>
+      <ul>
+        {taches.map((tache) => (
+          <li key={tache.id}>
+            {tache.completed ? '☑' : '☐'}{' '}
+            <a href={tache.url} target="_blank" rel="noopener noreferrer">{tache.title}</a>
+            {' '}({tache.completed ? 'fermée' : 'ouverte'})
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

@@ -1,0 +1,55 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SERVICE_FQDN_FRONTEND_8080: /
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.techtrends-tp3-tyspnf.rule=Host(`tp3-tyspnfjkpyoanadkb6x1e5ds.179.236.233.106.sslip.io`)'
+      - 'traefik.http.routers.techtrends-tp3-tyspnf.entrypoints=http'
+      - 'traefik.http.routers.techtrends-tp3-tyspnf.service=techtrends-tp3-tyspnf'
+      - 'traefik.http.services.techtrends-tp3-tyspnf.loadbalancer.server.port=8080'
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./tp3-api
+    environment:
+      DATABASE_URL: postgres://techtrends:${SERVICE_PASSWORD_POSTGRES}@db:5432/techtrends
+      REDIS_URL: redis://redis:6379
+      PORT: 3000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    build:
+      context: .
+      dockerfile: deploy/postgres.Dockerfile
+    environment:
+      POSTGRES_USER: techtrends
+      POSTGRES_DB: techtrends
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U techtrends -d techtrends']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
