@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 interface Post {
   id: number;
   title: string;
-  body: string;
+  description: string;
+  url: string;
 }
 
 function ListePosts() {
@@ -16,7 +17,7 @@ function ListePosts() {
 
     async function charger() {
       try {
-        const reponse = await fetch('https://jsonplaceholder.typicode.com/posts');
+        const reponse = await fetch('https://dev.to/api/articles?tag=react&per_page=10');
         if (!reponse.ok) {
           throw new Error('Réponse du serveur incorrecte : ' + reponse.status);
         }
@@ -47,8 +48,8 @@ function ListePosts() {
     <ul>
       {posts.slice(0, 10).map((post) => (
         <li key={post.id}>
-          <strong>{post.title}</strong>
-          <p>{post.body}</p>
+          <strong><a href={post.url} target="_blank" rel="noopener noreferrer">{post.title}</a></strong>
+          <p>{post.description}</p>
         </li>
       ))}
     </ul>

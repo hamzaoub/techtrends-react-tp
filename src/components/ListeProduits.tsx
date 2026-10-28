@@ -18,7 +18,7 @@ function ListeProduits() {
 
     async function charger() {
       try {
-        const reponse = await fetch('http://localhost:3000/api/produits');
+        const reponse = await fetch('/api/produits');
         if (!reponse.ok) {
           throw new Error('Réponse du serveur incorrecte : ' + reponse.status);
         }
@@ -29,7 +29,9 @@ function ListeProduits() {
         }
       } catch (e) {
         if (!annule) {
-          setErreur(e instanceof Error ? e.message : 'Erreur inconnue');
+          setErreur(e instanceof TypeError
+            ? 'Impossible de joindre l’API du TP3.'
+            : e instanceof Error ? e.message : 'Erreur inconnue');
           setChargement(false);
         }
       }
