@@ -63,7 +63,7 @@ main > section {
   margin-top: 28px;
 }
 
-main > section:first-of-type {
+.liste-technologies {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;

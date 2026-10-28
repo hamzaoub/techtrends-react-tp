@@ -7,7 +7,7 @@ interface ListeTendancesProps {
 
 function ListeTendances({ technologies }: ListeTendancesProps) {
   return (
-    <section>
+    <section className="liste-technologies">
       {technologies.map((tech) => <CarteTechnologie key={tech.id} tech={tech} />)}
     </section>
   );

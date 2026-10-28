@@ -1,8 +1,8 @@
 export interface Technologie {
-  id: number;
+  id: string;
   nom: string;
   categorie: string;
-  niveauPopularite: 1 | 2 | 3 | 4 | 5;
+  niveauPopularite: number;
   couleur: string;
 }
 interface CarteProps { tech: Technologie; }
